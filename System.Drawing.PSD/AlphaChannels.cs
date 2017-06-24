@@ -31,48 +31,51 @@ using System.IO;
 
 namespace System.Drawing.PSD
 {
-	public class AlphaChannels : ImageResource
-	{
-        private List<String> _channelNames;
-        public IEnumerable<String> ChannelNames { get { return _channelNames;  } }
+    public class AlphaChannels : ImageResource
+    {
+        private List<string> channelNames;
+        public IEnumerable<string> ChannelNames => channelNames;
 
-		public AlphaChannels()
-			: base((Int16)ResourceIDs.AlphaChannelNames)
-		{
-            _channelNames = new List<String>();
-		}
+        public AlphaChannels()
+            : base((short)ResourceIDs.AlphaChannelNames)
+        {
+            channelNames = new List<string>();
+        }
 
-		public AlphaChannels(ImageResource imageResource)
-			: base(imageResource)
-		{
-            _channelNames = new List<String>();
-			BinaryReverseReader reverseReader = imageResource.DataReader;
-			// the names are pascal strings without padding!!!
-			while ((reverseReader.BaseStream.Length - reverseReader.BaseStream.Position) > 0)
-			{
-				Byte stringLength = reverseReader.ReadByte();
-				String s = new String(reverseReader.ReadChars(stringLength));
+        public AlphaChannels(ImageResource imageResource)
+            : base(imageResource)
+        {
+            channelNames = new List<string>();
+            using (var reverseReader = imageResource.DataReader)
+            {
+                // the names are pascal strings without padding!!!
+                while ((reverseReader.BaseStream.Length - reverseReader.BaseStream.Position) > 0)
+                {
+                    string s = new string(reverseReader.ReadChars(reverseReader.ReadByte()));
 
-                if (s.Length > 0) _channelNames.Add(s);
-			}
-			reverseReader.Close();
-		}
+                    if (s.Length > 0)
+                        channelNames.Add(s);
+                }
+            }
+        }
 
-		protected override void StoreData()
-		{
-			MemoryStream memoryStream = new MemoryStream();
-			BinaryReverseWriter reverseWriter = new BinaryReverseWriter(memoryStream);
+        protected override void StoreData()
+        {
+            using (var memoryStream = new MemoryStream())
+            {
+                using (var reverseWriter = new BinaryReverseWriter(memoryStream))
+                {
+                    foreach (string name in ChannelNames)
+                    {
+                        reverseWriter.Write((byte)name.Length);
+                        reverseWriter.Write(name.ToCharArray());
+                    }
+                }
 
-			foreach (String name in ChannelNames)
-			{
-				reverseWriter.Write((Byte)name.Length);
-				reverseWriter.Write(name.ToCharArray());
-			}
+                Data = memoryStream.ToArray();
+            }
 
-			reverseWriter.Close();
-			memoryStream.Close();
 
-			Data = memoryStream.ToArray();
-		}
-	}
+        }
+    }
 }
