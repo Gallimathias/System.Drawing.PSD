@@ -33,11 +33,13 @@ namespace System.Drawing.PSD
 {
 	public class ImageDecoder
 	{
-		public static Bitmap DecodeImage(PsdFile psdFile)
+		public unsafe static Bitmap DecodeImage(PsdFile psdFile)
 		{
 			Bitmap bitmap = new Bitmap(psdFile.Columns, psdFile.Rows, PixelFormat.Format32bppArgb);
 
-			//Parallel load each row
+            var bmpData = bitmap.LockBits(new Rectangle(Point.Empty, bitmap.Size), ImageLockMode.WriteOnly, bitmap.PixelFormat);
+            //Parallel load each row
+            var ptr = (uint*)bmpData.Scan0;
 			Parallel.For(0, psdFile.Rows, y =>
 										  {
 											  Int32 rowIndex = y * psdFile.Columns;
@@ -46,24 +48,29 @@ namespace System.Drawing.PSD
 											  {
 												  Int32 pos = rowIndex + x;
 
-												  Color pixelColor = GetColor(psdFile, pos);
+												  uint pixelColor = GetColor(psdFile, pos);
 
-												  lock (bitmap)
-												  {
-													  bitmap.SetPixel(x, y, pixelColor);
-												  }
+                                                  ptr[y * bitmap.Width + x] = pixelColor;
+												  //lock (bitmap)
+												  //{
+													//  bitmap.SetPixel(x, y, pixelColor);
+												  //}
+
 											  }
 										  });
-
+            bitmap.UnlockBits(bmpData);
 			return bitmap;
 		}
 
-        public static Bitmap DecodeImage(Layer layer)
+        public static unsafe Bitmap DecodeImage(Layer layer)
         {
             if (layer.Rect.Width == 0 || layer.Rect.Height == 0) return null;
 
             Bitmap bitmap = new Bitmap(layer.Rect.Width, layer.Rect.Height, PixelFormat.Format32bppArgb);
-
+            int width = bitmap.Width;
+            var bmpData = bitmap.LockBits(new Rectangle(Point.Empty, bitmap.Size), ImageLockMode.WriteOnly, bitmap.PixelFormat);
+            //Parallel load each row
+            var ptr = (uint*)bmpData.Scan0;
             Parallel.For(0, layer.Rect.Height, y =>
             {
                 Int32 rowIndex = y * layer.Rect.Width;
@@ -72,24 +79,26 @@ namespace System.Drawing.PSD
                 {
                     Int32 pos = rowIndex + x;
 
-                    Color pixelColor = GetColor(layer, pos);
+                    var color = GetColor(layer, pos);
+                    uint pixelColor = (uint)color.ToArgb();
 
                     if (layer.SortedChannels.ContainsKey(-2))
                     {
                         Int32 maskAlpha = GetColor(layer.MaskData, x, y);
-                        Int32 oldAlpha = pixelColor.A;
+                        Int32 oldAlpha = color.A;
 
                         Int32 newAlpha = (oldAlpha * maskAlpha) / 255;
-                        pixelColor = Color.FromArgb(newAlpha, pixelColor);
+                        pixelColor = (uint)Color.FromArgb(newAlpha, color).ToArgb();
                     }
 
-                    lock (bitmap)
-                    {
-                        bitmap.SetPixel(x, y, pixelColor);
-                    }
+                    ptr[y * width + x] = pixelColor;
+                    //lock (bitmap)
+                    //{
+                    //    bitmap.SetPixel(x, y, pixelColor);
+                    //}
                 }
             });
-
+            bitmap.UnlockBits(bmpData);
             return bitmap;
         }
 
@@ -120,33 +129,33 @@ namespace System.Drawing.PSD
             return bitmap;
         }
 
-		private static Color GetColor(PsdFile psdFile, Int32 pos)
+		private static uint GetColor(PsdFile psdFile, Int32 pos)
 		{
-			Color c = Color.White;
+			uint c = 0xFFFFFFFF;
 
 			switch (psdFile.ColorMode)
 			{
 				case PsdFile.ColorModes.RGB:
-					c = Color.FromArgb(psdFile.ImageData[0][pos], psdFile.ImageData[1][pos], psdFile.ImageData[2][pos]);
+					c = (uint)Color.FromArgb(psdFile.ImageData[0][pos], psdFile.ImageData[1][pos], psdFile.ImageData[2][pos]).ToArgb();
 					break;
 				case PsdFile.ColorModes.CMYK:
-					c = CMYKToRGB(psdFile.ImageData[0][pos], psdFile.ImageData[1][pos], psdFile.ImageData[2][pos], psdFile.ImageData[3][pos]);
+					c = (uint)CMYKToRGB(psdFile.ImageData[0][pos], psdFile.ImageData[1][pos], psdFile.ImageData[2][pos], psdFile.ImageData[3][pos]).ToArgb();
 					break;
 				case PsdFile.ColorModes.Multichannel:
-					c = CMYKToRGB(psdFile.ImageData[0][pos], psdFile.ImageData[1][pos], psdFile.ImageData[2][pos], 0);
+					c = (uint)CMYKToRGB(psdFile.ImageData[0][pos], psdFile.ImageData[1][pos], psdFile.ImageData[2][pos], 0).ToArgb();
 					break;
 				case PsdFile.ColorModes.Grayscale:
 				case PsdFile.ColorModes.Duotone:
-					c = Color.FromArgb(psdFile.ImageData[0][pos], psdFile.ImageData[0][pos], psdFile.ImageData[0][pos]);
+					c = (uint)Color.FromArgb(psdFile.ImageData[0][pos], psdFile.ImageData[0][pos], psdFile.ImageData[0][pos]).ToArgb();
 					break;
 				case PsdFile.ColorModes.Indexed:
 					{
 						Int32 index = psdFile.ImageData[0][pos];
-						c = Color.FromArgb(psdFile.ColorModeData[index], psdFile.ColorModeData[index + 256], psdFile.ColorModeData[index + 2 * 256]);
+						c = (uint)Color.FromArgb(psdFile.ColorModeData[index], psdFile.ColorModeData[index + 256], psdFile.ColorModeData[index + 2 * 256]).ToArgb();
 					}
 					break;
 				case PsdFile.ColorModes.Lab:
-						c = LabToRGB(psdFile.ImageData[0][pos], psdFile.ImageData[1][pos], psdFile.ImageData[2][pos]);
+						c = (uint)LabToRGB(psdFile.ImageData[0][pos], psdFile.ImageData[1][pos], psdFile.ImageData[2][pos]).ToArgb();
 					break;
 			}
 
