@@ -1,0 +1,122 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml-stylesheet type="text/xsl" href="d:\program files (x86)\microsoft visual studio\2017\enterprise\team tools\static analysis tools\fxcop\Xml\CodeAnalysisReport.xsl"?>
+<FxCopReport Version="15.0">
+ <Targets>
+  <Target Name="D:\Projekte\Visual 2017\System.Drawing.PSD\System.Drawing.PSD\lib\net40\System.Drawing.PSD.dll">
+   <Modules>
+    <Module Name="system.drawing.psd.dll">
+     <Namespaces>
+      <Namespace Name="System.Drawing.PSD">
+       <Types>
+        <Type Name="AlphaChannels" Kind="Class" Accessibility="Public" ExternallyVisible="True">
+         <Members>
+          <Member Name="#StoreData()" Kind="Method" Static="False" Accessibility="Family" ExternallyVisible="True">
+           <Messages>
+            <Message TypeName="Objekte nicht mehrmals verwerfen" Category="Microsoft.Usage" CheckId="CA2202" Status="Active" Created="2017-06-25 20:34:15Z" FixCategory="DependsOnFix">
+             <Issue Certainty="75" Level="Warning" Path="D:\Projekte\Visual 2017\System.Drawing.PSD\System.Drawing.PSD" File="AlphaChannels.cs" Line="76">Das Objekt "'memoryStream'" kann mehrere Male in der 'AlphaChannels.StoreData()'-Methode verworfen werden. Um zu verhindern, dass eine System.ObjectDisposedException generiert wird, sollten Sie die Dispose-Methode nur einmal für ein Objekt aufrufen.: Lines: 76</Issue>
+            </Message>
+           </Messages>
+          </Member>
+         </Members>
+        </Type>
+        <Type Name="ImageDecoder" Kind="Class" Accessibility="Public" ExternallyVisible="True">
+         <Members>
+          <Member Name="#DecodeImage(System.Drawing.PSD.Layer)" Kind="Method" Static="True" Accessibility="Public" ExternallyVisible="True">
+           <Messages>
+            <Message TypeName="DoNotLockOnObjectsWithWeakIdentity" Category="Microsoft.Reliability" CheckId="CA2002" Status="Active" Created="2017-06-25 20:34:15Z" FixCategory="NonBreaking">
+             <Issue Certainty="75" Level="CriticalError" Path="D:\Projekte\Visual 2017\System.Drawing.PSD\System.Drawing.PSD" File="ImageDecoder.cs" Line="90">'ImageDecoder.DecodeImage(Layer)' Sperren auf Verweis von Typ "'Bitmap'". Ersetzen Sie diese durch eine Sperre eines Objekts mit starker Identität.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+          <Member Name="#DecodeImage(System.Drawing.PSD.Layer+Mask)" Kind="Method" Static="True" Accessibility="Public" ExternallyVisible="True">
+           <Messages>
+            <Message TypeName="DoNotLockOnObjectsWithWeakIdentity" Category="Microsoft.Reliability" CheckId="CA2002" Status="Active" Created="2017-06-25 20:34:15Z" FixCategory="NonBreaking">
+             <Issue Certainty="75" Level="CriticalError" Path="D:\Projekte\Visual 2017\System.Drawing.PSD\System.Drawing.PSD" File="ImageDecoder.cs" Line="119">'ImageDecoder.DecodeImage(Layer.Mask)' Sperren auf Verweis von Typ "'Bitmap'". Ersetzen Sie diese durch eine Sperre eines Objekts mit starker Identität.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+          <Member Name="#DecodeImage(System.Drawing.PSD.PsdFile)" Kind="Method" Static="True" Accessibility="Public" ExternallyVisible="True">
+           <Messages>
+            <Message TypeName="DoNotLockOnObjectsWithWeakIdentity" Category="Microsoft.Reliability" CheckId="CA2002" Status="Active" Created="2017-06-25 20:34:15Z" FixCategory="NonBreaking">
+             <Issue Certainty="75" Level="CriticalError" Path="D:\Projekte\Visual 2017\System.Drawing.PSD\System.Drawing.PSD" File="ImageDecoder.cs" Line="54">'ImageDecoder.DecodeImage(PsdFile)' Sperren auf Verweis von Typ "'Bitmap'". Ersetzen Sie diese durch eine Sperre eines Objekts mit starker Identität.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+         </Members>
+        </Type>
+        <Type Name="Layer+Channel" Kind="Class" Accessibility="Public" ExternallyVisible="True">
+         <Members>
+          <Member Name="#CompressImageData()" Kind="Method" Static="False" Accessibility="Private" ExternallyVisible="False">
+           <Messages>
+            <Message TypeName="Objekte nicht mehrmals verwerfen" Category="Microsoft.Usage" CheckId="CA2202" Status="Active" Created="2017-06-25 20:34:15Z" FixCategory="DependsOnFix">
+             <Issue Certainty="75" Level="Warning" Path="D:\Projekte\Visual 2017\System.Drawing.PSD\System.Drawing.PSD" File="LayerChannel.cs" Line="202">Das Objekt "'memoryStream'" kann mehrere Male in der 'Layer.Channel.CompressImageData()'-Methode verworfen werden. Um zu verhindern, dass eine System.ObjectDisposedException generiert wird, sollten Sie die Dispose-Methode nur einmal für ein Objekt aufrufen.: Lines: 202</Issue>
+            </Message>
+           </Messages>
+          </Member>
+         </Members>
+        </Type>
+        <Type Name="ResolutionInfo" Kind="Class" Accessibility="Public" ExternallyVisible="True">
+         <Members>
+          <Member Name="#StoreData()" Kind="Method" Static="False" Accessibility="Family" ExternallyVisible="True">
+           <Messages>
+            <Message TypeName="Objekte nicht mehrmals verwerfen" Category="Microsoft.Usage" CheckId="CA2202" Status="Active" Created="2017-06-25 20:34:15Z" FixCategory="DependsOnFix">
+             <Issue Certainty="75" Level="Warning" Path="D:\Projekte\Visual 2017\System.Drawing.PSD\System.Drawing.PSD" File="ResolutionInfo.cs" Line="130">Das Objekt "'memoryStream'" kann mehrere Male in der 'ResolutionInfo.StoreData()'-Methode verworfen werden. Um zu verhindern, dass eine System.ObjectDisposedException generiert wird, sollten Sie die Dispose-Methode nur einmal für ein Objekt aufrufen.: Lines: 130</Issue>
+            </Message>
+           </Messages>
+          </Member>
+         </Members>
+        </Type>
+       </Types>
+      </Namespace>
+     </Namespaces>
+    </Module>
+   </Modules>
+  </Target>
+ </Targets>
+ <Rules>
+  <Rule TypeName="DoNotLockOnObjectsWithWeakIdentity" Category="Microsoft.Reliability" CheckId="CA2002">
+   <Name>Auf Objekten mit schwacher Identität nicht sperren</Name>
+   <Description>Verwenden Sie keine Sperren auf Objekten, die über AppDomains auslaufen können oder über keine starke Identität verfügen.</Description>
+   <Resolution Name="Default">{0} Sperren auf Verweis von Typ "{1}". Ersetzen Sie diese durch eine Sperre eines Objekts mit starker Identität.</Resolution>
+   <Owner />
+   <Url>http://msdn.microsoft.com/library/ms182290.aspx</Url>
+   <Email>[none]</Email>
+   <MessageLevel Certainty="75">CriticalError</MessageLevel>
+   <File Name="reliabilityrules.dll" Version="15.0.0.0" />
+  </Rule>
+  <Rule TypeName="Objekte nicht mehrmals verwerfen" Category="Microsoft.Usage" CheckId="CA2202">
+   <Name>Objekte nicht mehrmals verwerfen</Name>
+   <Description>Eine ordnungsgemäß implementierte Dispose-Methode kann mehrere Male aufgerufen werden, ohne dass eine Ausnahme ausgelöst wird. Dies ist jedoch nicht garantiert. Um zu verhindern, dass eine System.ObjectDisposedException generiert wird, sollten Sie die Dispose-Methode nur einmal für ein Objekt aufrufen.</Description>
+   <Resolution Name="Default">Das Objekt "{0}" kann mehrere Male in der {1}-Methode verworfen werden. Um zu verhindern, dass eine System.ObjectDisposedException generiert wird, sollten Sie die Dispose-Methode nur einmal für ein Objekt aufrufen.: Lines: 202</Resolution>
+   <Owner>RuleOwner</Owner>
+   <Url>http://msdn.microsoft.com/library/ms182334.aspx</Url>
+   <Email />
+   <MessageLevel Certainty="75">Warning</MessageLevel>
+   <File Name="dataflowrules.dll" Version="15.0.0.0" />
+  </Rule>
+ </Rules>
+ <Localized>
+  <String Key="Category">Kategorie</String>
+  <String Key="Certainty">Sicherheit</String>
+  <String Key="CollapseAll">Alle zuklappen</String>
+  <String Key="CheckId">Prüf-ID</String>
+  <String Key="Error">Fehler</String>
+  <String Key="Errors">Fehler</String>
+  <String Key="ExpandAll">Alle aufklappen</String>
+  <String Key="Help">Hilfe</String>
+  <String Key="Line">Zeile</String>
+  <String Key="Messages">Meldung(en)</String>
+  <String Key="LocationNotStoredInPdb">[Nicht in PDB gespeicherter Speicherort]</String>
+  <String Key="Project">Projekt</String>
+  <String Key="Resolution">Auflösung</String>
+  <String Key="Rule">Regel</String>
+  <String Key="RuleFile">Regeldatei</String>
+  <String Key="RuleDescription">Regelbeschreibung</String>
+  <String Key="Source">Quelle</String>
+  <String Key="Status">Status</String>
+  <String Key="Target">Ziel</String>
+  <String Key="Warning">Warnung</String>
+  <String Key="Warnings">Warnung(en)</String>
+  <String Key="ReportTitle">Codeanalysebericht</String>
+ </Localized>
+</FxCopReport>
