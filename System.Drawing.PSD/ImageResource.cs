@@ -100,38 +100,38 @@ namespace System.Drawing.PSD
 	/// </summary>
 	public class ImageResource
 	{
-		public Int16 ID { get; set; }
-        public String Name { get; private set; }
-        public Byte[] Data { get; set; }
-        public String OSType { get; private set; }
+		public short ID { get; set; }
+        public string Name { get; private set; }
+        public byte[] Data { get; set; }
+        public string OSType { get; private set; }
 
 		public ImageResource()
 		{
-			OSType = String.Empty;
-			Name = String.Empty;
+			OSType = string.Empty;
+			Name = string.Empty;
 		}
 
 		public ImageResource(short id)
 		{
-			OSType = String.Empty;
-			Name = String.Empty;
+			OSType = string.Empty;
+			Name = string.Empty;
 			ID = id;
 		}
 
 		public ImageResource(ImageResource imgRes)
 		{
-			OSType = String.Empty;
+			OSType = string.Empty;
 			ID = imgRes.ID;
 			Name = imgRes.Name;
 
-			Data = new Byte[imgRes.Data.Length];
+			Data = new byte[imgRes.Data.Length];
 			imgRes.Data.CopyTo(Data, 0);
 		}
 
 		public ImageResource(BinaryReverseReader reverseReader)
 		{
-			Name = String.Empty;
-			OSType = new String(reverseReader.ReadChars(4));
+			Name = string.Empty;
+			OSType = new string(reverseReader.ReadChars(4));
 			if (OSType != "8BIM" && OSType != "MeSa")
 			{
 				throw new InvalidOperationException("Could not read an image resource");
@@ -140,8 +140,8 @@ namespace System.Drawing.PSD
 			ID = reverseReader.ReadInt16();
 			Name = reverseReader.ReadPascalString();
 
-			UInt32 settingLength = reverseReader.ReadUInt32();
-			Data = reverseReader.ReadBytes((Int32)settingLength);
+			uint settingLength = reverseReader.ReadUInt32();
+			Data = reverseReader.ReadBytes((int)settingLength);
 
 			if (reverseReader.BaseStream.Position % 2 == 1) reverseReader.ReadByte();
 		}
@@ -150,7 +150,7 @@ namespace System.Drawing.PSD
 		{
 			StoreData();
 
-			if (OSType == String.Empty) OSType = "8BIM";
+			if (OSType == string.Empty) OSType = "8BIM";
 
 			reverseWriter.Write(OSType.ToCharArray());
 			reverseWriter.Write(ID);
@@ -178,7 +178,7 @@ namespace System.Drawing.PSD
 
 		public override string ToString()
 		{
-			return String.Format("{0} {1}", (ResourceIDs)ID, Name);
+			return string.Format("{0} {1}", (ResourceIDs)ID, Name);
 		}
 	}
 }
